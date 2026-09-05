@@ -43,12 +43,12 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       title={theme === 'dark' ? 'Включить светлую тему' : 'Включить темную тему'}
-      className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition"
+      className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white glass-panel border border-slate-200 dark:border-white/[0.08] hover:border-emerald-500/40 transition-all duration-200 active:scale-95 shadow-sm"
     >
       {theme === 'dark' ? (
-        <Sun className="w-4 h-4 text-amber-400" />
+        <Sun className="w-4 h-4 text-amber-400 stroke-[2.2]" />
       ) : (
-        <Moon className="w-4 h-4 text-slate-700" />
+        <Moon className="w-4 h-4 text-slate-700 stroke-[2.2]" />
       )}
     </button>
   )
