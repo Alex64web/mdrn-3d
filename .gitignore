@@ -33,3 +33,5 @@ yarn-error.log*
 
 # Start scripts
 start.bat
+.vercel
+.env*
