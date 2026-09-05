@@ -1,26 +1,15 @@
 import { prisma } from '@/lib/prisma'
-import { cookies } from 'next/headers'
+import { getCurrentUser } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard'
 
 export const revalidate = 0 // Disable cache for live matching/order updates
 
 export default async function DashboardPage() {
-  const users = await prisma.user.findMany({
-    orderBy: { role: 'asc' }
-  })
+  const activeUser = await getCurrentUser()
 
-  const activeUserId = cookies().get('active_user_id')?.value
-  let activeUser = null
-
-  if (activeUserId) {
-    activeUser = await prisma.user.findUnique({
-      where: { id: activeUserId },
-      include: { makerProfile: true }
-    })
-  }
-  
-  if (!activeUser && users.length > 0) {
-    activeUser = users.find(u => u.role === 'CLIENT') || users[0]
+  if (!activeUser) {
+    redirect('/login?callback=/dashboard')
   }
 
   const orders = await prisma.order.findMany({

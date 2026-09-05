@@ -3,10 +3,11 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
-import UserSelector from '@/components/UserSelector'
+import UserAuthHeader from '@/components/UserAuthHeader'
 import ThemeToggle from '@/components/ThemeToggle'
 import Link from 'next/link'
-import { Box, Layers, ShieldCheck, Wallet } from 'lucide-react'
+import { Box, Layers, ShieldCheck } from 'lucide-react'
+import { getCurrentUser } from '@/lib/auth'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
@@ -20,20 +21,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const users = await prisma.user.findMany({
-    orderBy: { role: 'asc' }
-  })
-
-  const activeUserId = cookies().get('active_user_id')?.value
-  let activeUser = null
-  
-  if (activeUserId) {
-    activeUser = await prisma.user.findUnique({
-      where: { id: activeUserId }
-    })
-  } else if (users.length > 0) {
-    activeUser = users.find(u => u.role === 'CLIENT') || users[0]
-  }
+  const activeUser = await getCurrentUser()
 
   return (
     <html lang="ru" className="dark h-full">
@@ -70,20 +58,15 @@ export default async function RootLayout({
               </nav>
             </div>
 
-            {/* Right Controls: User Switcher, Balance, Theme Toggle */}
+            {/* Right Controls: Auth Header & Theme Toggle */}
             <div className="flex items-center gap-3">
-              <UserSelector users={users.map(u => ({ id: u.id, name: u.name, role: u.role, email: u.email }))} />
-
-              {/* Active User Balance */}
-              {activeUser && (
-                <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs">
-                  <Wallet className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-slate-500 dark:text-slate-400 font-medium">Баланс:</span>
-                  <span className="font-bold text-slate-900 dark:text-emerald-400">
-                    {Math.round(activeUser.balance).toLocaleString('ru-RU')} ₽
-                  </span>
-                </div>
-              )}
+              <UserAuthHeader user={activeUser ? {
+                id: activeUser.id,
+                name: activeUser.name,
+                email: activeUser.email,
+                role: activeUser.role,
+                balance: activeUser.balance
+              } : null} />
 
               {/* Theme Switcher Button */}
               <ThemeToggle />

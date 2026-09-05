@@ -2,6 +2,118 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { hashPassword, verifyPassword, setSession, clearSession, getCurrentUser } from '@/lib/auth'
+
+// 0. Authentication Actions
+export async function registerUser(data: {
+  name: string
+  email: string
+  password: string
+  role: 'CLIENT' | 'DESIGNER' | 'MAKER'
+  printerName?: string
+  bedSizeX?: number
+  bedSizeY?: number
+  bedSizeZ?: number
+  materials?: string
+  colors?: string
+  location?: string
+}) {
+  try {
+    const existing = await prisma.user.findUnique({
+      where: { email: data.email.toLowerCase().trim() }
+    })
+    if (existing) {
+      return { success: false, error: 'Пользователь с таким email уже зарегистрирован' }
+    }
+
+    if (!data.password || data.password.length < 4) {
+      return { success: false, error: 'Пароль должен содержать не менее 4 символов' }
+    }
+
+    const passwordHash = hashPassword(data.password)
+
+    const user = await prisma.user.create({
+      data: {
+        name: data.name.trim(),
+        email: data.email.toLowerCase().trim(),
+        passwordHash,
+        role: data.role,
+        balance: 5000.0,
+        ...(data.role === 'MAKER' ? {
+          makerProfile: {
+            create: {
+              printerName: data.printerName || 'Bambu Lab P1S',
+              bedSizeX: data.bedSizeX || 256,
+              bedSizeY: data.bedSizeY || 256,
+              bedSizeZ: data.bedSizeZ || 256,
+              materials: data.materials || 'PLA,PETG,ABS',
+              colors: data.colors || 'Черный,Белый,Оранжевый',
+              location: data.location || 'Москва',
+              rating: 5.0
+            }
+          }
+        } : {})
+      },
+      include: {
+        makerProfile: true
+      }
+    })
+
+    await setSession(user.id)
+    revalidatePath('/')
+    revalidatePath('/dashboard')
+    revalidatePath('/catalog')
+    return { success: true, user }
+  } catch (error: any) {
+    console.error('Register error:', error)
+    return { success: false, error: error.message || 'Ошибка регистрации' }
+  }
+}
+
+export async function loginUser(data: {
+  email: string
+  password: string
+}) {
+  try {
+    const email = data.email.toLowerCase().trim()
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { makerProfile: true }
+    })
+
+    if (!user) {
+      return { success: false, error: 'Пользователь с таким email не найден' }
+    }
+
+    const isValid = user.passwordHash 
+      ? verifyPassword(data.password, user.passwordHash) 
+      : (data.password === '123456')
+      
+    if (!isValid) {
+      return { success: false, error: 'Неверный пароль' }
+    }
+
+    await setSession(user.id)
+    revalidatePath('/')
+    revalidatePath('/dashboard')
+    revalidatePath('/catalog')
+    return { success: true, user }
+  } catch (error: any) {
+    console.error('Login error:', error)
+    return { success: false, error: error.message || 'Ошибка входа' }
+  }
+}
+
+export async function logoutUser() {
+  await clearSession()
+  revalidatePath('/')
+  revalidatePath('/dashboard')
+  return { success: true }
+}
+
+export async function getAuthUser() {
+  return getCurrentUser()
+}
 
 // 1. User Actions
 export async function getUsers() {

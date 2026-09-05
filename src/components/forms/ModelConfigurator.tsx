@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import StlViewer from '../viewer/StlViewer'
 import { estimatePrint, MaterialType } from '@/lib/slicer-calc'
 import { createOrderRequest } from '@/app/actions'
@@ -72,7 +73,7 @@ export default function ModelConfigurator({ model, clientId }: ModelConfigurator
   const handleRequestSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!clientId) {
-      setErrorMsg('Не выбран активный пользователь. Выберите роль Клиента в верхнем меню.')
+      router.push(`/login?callback=/model/${model.id}`)
       return
     }
 
@@ -297,19 +298,29 @@ export default function ModelConfigurator({ model, clientId }: ModelConfigurator
             </div>
           )}
 
-          {/* Submit Request Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting || !clientId}
-            className={`w-full py-4 font-bold text-sm rounded-2xl transition flex items-center justify-center gap-2 shadow-sm ${
-              isSubmitting
-                ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                : 'bg-orange-500 hover:bg-orange-600 text-white cursor-pointer'
-            }`}
-          >
-            <Send className="w-4 h-4" />
-            <span>{isSubmitting ? 'Отправка заявки...' : 'Отправить заявку мастерам'}</span>
-          </button>
+          {/* Submit Request Button or Login prompt */}
+          {clientId ? (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full py-4 font-bold text-sm rounded-2xl transition flex items-center justify-center gap-2 shadow-sm ${
+                isSubmitting
+                  ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                  : 'bg-orange-500 hover:bg-orange-600 text-white cursor-pointer'
+              }`}
+            >
+              <Send className="w-4 h-4" />
+              <span>{isSubmitting ? 'Отправка заявки...' : 'Отправить заявку мастерам'}</span>
+            </button>
+          ) : (
+            <Link
+              href={`/login?callback=/model/${model.id}`}
+              className="w-full py-4 font-bold text-sm rounded-2xl bg-orange-500 hover:bg-orange-600 text-white transition flex items-center justify-center gap-2 shadow-sm"
+            >
+              <Send className="w-4 h-4" />
+              <span>Войдите в аккаунт, чтобы оставить заявку</span>
+            </Link>
+          )}
         </div>
       </form>
     </div>

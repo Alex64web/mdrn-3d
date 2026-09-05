@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { cookies } from 'next/headers'
+import { getCurrentUser } from '@/lib/auth'
 import ModelConfigurator from '@/components/forms/ModelConfigurator'
 import Link from 'next/link'
 import { ArrowLeft, Box, User, Coins } from 'lucide-react'
@@ -33,18 +33,8 @@ export default async function ModelPage({ params }: PageProps) {
     )
   }
 
-  const activeUserId = cookies().get('active_user_id')?.value
-  const users = await prisma.user.findMany({ where: { role: 'CLIENT' } })
-  const defaultClient = users[0]
-
-  let clientUser = null
-  if (activeUserId) {
-    clientUser = await prisma.user.findUnique({
-      where: { id: activeUserId }
-    })
-  }
-
-  const clientId = clientUser?.id || defaultClient?.id || ''
+  const clientUser = await getCurrentUser()
+  const clientId = clientUser?.id || ''
 
   return (
     <div className="flex flex-col gap-6 py-2">
