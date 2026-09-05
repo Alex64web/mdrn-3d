@@ -9,7 +9,8 @@ import {
   submitOrderQCCheck, 
   confirmOrderDelivery, 
   updateMakerProfile,
-  submitOrderReview
+  submitOrderReview,
+  deleteOrderRequest
 } from '@/app/actions'
 import * as Tabs from '@radix-ui/react-tabs'
 import { 
@@ -31,7 +32,8 @@ import {
   Clock,
   User,
   Send,
-  Sparkles
+  Sparkles,
+  Trash2
 } from 'lucide-react'
 
 const MOCK_QC_PHOTO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
@@ -133,6 +135,7 @@ export default function UnifiedDashboard({ activeUser, allOrders, allModels }: U
   const [qcForms, setQcForms] = useState<Record<string, { weight: number; trackingNumber: string; fileBase64: string }>>({})
   const [reviewForms, setReviewForms] = useState<Record<string, { rating: number; comment: string }>>({})
   const [acceptingOfferId, setAcceptingOfferId] = useState<string | null>(null)
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null)
 
   const handleModelFileChange = (path: string) => {
     let sizes = { sizeX: 20, sizeY: 20, sizeZ: 20, volume: 8.0, price: 200 }
@@ -266,6 +269,24 @@ export default function UnifiedDashboard({ activeUser, allOrders, allModels }: U
       router.refresh()
     } catch (err: any) {
       alert('Ошибка завершения: ' + err.message)
+    }
+  }
+
+  // Client deletes their own open request
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm('Вы уверены, что хотите отозвать и удалить эту заявку? Все полученные предложения мастеров будут аннулированы.')) {
+      return
+    }
+
+    setDeletingOrderId(orderId)
+    try {
+      await deleteOrderRequest(orderId, activeUser.id)
+      alert('Заявка успешно удалена.')
+      router.refresh()
+    } catch (err: any) {
+      alert('Ошибка при удалении заявки: ' + err.message)
+    } finally {
+      setDeletingOrderId(null)
     }
   }
 
@@ -431,13 +452,27 @@ export default function UnifiedDashboard({ activeUser, allOrders, allModels }: U
                           </div>
                         </div>
 
-                        {/* Status Badge */}
-                        <div className="shrink-0">
+                        {/* Status Badge & Actions */}
+                        <div className="flex items-center gap-2 shrink-0">
                           {isRequest && (
-                            <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center gap-1.5 shadow-glow-orange">
-                              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                              АУКЦИОН ({offersCount} предл.)
-                            </span>
+                            <>
+                              <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center gap-1.5 shadow-glow-orange">
+                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                АУКЦИОН ({offersCount} предл.)
+                              </span>
+                              <button
+                                type="button"
+                                disabled={deletingOrderId === order.id}
+                                onClick={() => handleDeleteOrder(order.id)}
+                                title="Отозвать и удалить эту заявку"
+                                className="px-2.5 py-1 text-xs font-mono text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 border border-slate-200 dark:border-white/[0.08] hover:border-rose-500/30 rounded-xl transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
+                                <span className="hidden sm:inline">
+                                  {deletingOrderId === order.id ? 'Удаление...' : 'Отозвать заявку'}
+                                </span>
+                              </button>
+                            </>
                           )}
                           {order.status === 'PRINTING' && (
                             <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 inline-flex items-center gap-1.5 shadow-glow-cyan">
@@ -464,9 +499,18 @@ export default function UnifiedDashboard({ activeUser, allOrders, allModels }: U
                       {/* Details & Offers */}
                       {isRequest && (
                         <div className="flex flex-col gap-4">
-                          <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-500 glass-panel p-3 rounded-xl border border-slate-200/60 dark:border-white/[0.04]">
+                          <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-500 glass-panel p-3 rounded-xl border border-slate-200/60 dark:border-white/[0.04] gap-2">
                             <span>АВТОРСКИЙ РОЯЛТИ: <strong className="text-emerald-600 dark:text-emerald-400">{order.modelPrice} ₽</strong></span>
                             <span>АДРЕС ДОСТАВКИ: <strong className="text-slate-800 dark:text-slate-200">{order.deliveryAddress}</strong></span>
+                            <button
+                              type="button"
+                              disabled={deletingOrderId === order.id}
+                              onClick={() => handleDeleteOrder(order.id)}
+                              className="text-rose-500 hover:text-rose-400 text-[11px] flex items-center gap-1 cursor-pointer transition ml-auto sm:ml-0"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>{deletingOrderId === order.id ? 'Удаление...' : 'Отозвать заявку'}</span>
+                            </button>
                           </div>
 
                           {offersCount === 0 ? (

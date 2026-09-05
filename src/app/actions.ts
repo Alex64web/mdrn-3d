@@ -238,6 +238,38 @@ export async function createOrderRequest(data: {
   return order
 }
 
+// Client deletes / cancels their own order request before it is accepted
+export async function deleteOrderRequest(orderId: string, clientId: string) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId }
+  })
+
+  if (!order) {
+    throw new Error('Заявка не найдена')
+  }
+
+  if (order.clientId !== clientId) {
+    throw new Error('У вас нет прав для удаления этой заявки')
+  }
+
+  if (order.status !== 'REQUEST') {
+    throw new Error('Нельзя удалить заявку, которая уже принята в работу. Деньги заморожены в Escrow.')
+  }
+
+  await prisma.$transaction([
+    prisma.orderOffer.deleteMany({
+      where: { orderId }
+    }),
+    prisma.order.delete({
+      where: { id: orderId }
+    })
+  ])
+
+  revalidatePath('/dashboard')
+  revalidatePath('/')
+  return { success: true }
+}
+
 // Maker submits a quotation offer for an open request
 export async function submitMakerOffer(data: {
   orderId: string
