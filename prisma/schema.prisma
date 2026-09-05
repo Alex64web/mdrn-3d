@@ -1,0 +1,127 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  role         String        // "CLIENT" | "DESIGNER" | "MAKER" | "ADMIN"
+  balance      Float         @default(0.0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  // Relations
+  makerProfile MakerProfile?
+  models       Model3D[]     @relation("DesignerModels")
+  orders       Order[]       @relation("ClientOrders")
+  jobs         Order[]       @relation("MakerJobs")
+  offers       OrderOffer[]  @relation("MakerOffers")
+  reviews      Review[]      @relation("MakerReviews")
+}
+
+model MakerProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  printerName String   // e.g. "Creality Ender 3", "Bambu Lab X1C"
+  bedSizeX    Float    // Width in mm
+  bedSizeY    Float    // Depth in mm
+  bedSizeZ    Float    // Height in mm
+  materials   String   // Comma-separated: "PLA,PETG,ABS,TPU"
+  colors      String   // Comma-separated: "Red,Black,White,Gray,Blue"
+  location    String   // Location text, e.g. "Kazan"
+  latitude    Float    @default(55.7887)
+  longitude   Float    @default(49.1221)
+  rating      Float    @default(5.0)
+}
+
+model Model3D {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  filePath    String   // Path to public sample, e.g., "/sample-models/cube.stl"
+  price       Float    @default(300.0) // Фиксированная авторская цена за модель (руб.)
+  royalty     Float    @default(15.0) // Референсный процент (опционально)
+  tags        String   // Comma-separated tags, e.g. "Utility,Calibration"
+  
+  // Model physical characteristics
+  sizeX       Float    // Bounding Box X (mm)
+  sizeY       Float    // Bounding Box Y (mm)
+  sizeZ       Float    // Bounding Box Z (mm)
+  volume      Float    // Solid volume in cm³ (cc)
+  
+  designerId  String
+  designer    User     @relation("DesignerModels", fields: [designerId], references: [id], onDelete: Cascade)
+  orders      Order[]
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id              String       @id @default(uuid())
+  clientId        String
+  client          User         @relation("ClientOrders", fields: [clientId], references: [id])
+  
+  modelId         String
+  model           Model3D      @relation(fields: [modelId], references: [id])
+  
+  material        String       // "PLA" | "PETG" | "ABS" | "TPU"
+  color           String       // e.g. "Signal Orange", "Black"
+  infill          Int          // percentage, e.g. 15, 40, 100
+  layerHeight     Float        // layer height in mm, e.g. 0.12, 0.20, 0.28
+  
+  modelPrice      Float        @default(0.0) // Авторская плата дизайнеру
+  makerPrice      Float        @default(0.0) // Согласованная цена мастера за изготовление
+  totalPrice      Float        @default(0.0) // Итоговая сумма списания (model + maker + platform fee)
+  
+  escrowStatus    String       @default("NONE") // "NONE" | "HELD" | "RELEASED" | "REFUNDED"
+  status          String       @default("REQUEST") // "REQUEST" | "PRINTING" | "SHIPPED" | "COMPLETED" | "CANCELLED"
+  deliveryAddress String
+  
+  makerId         String?
+  maker           User?        @relation("MakerJobs", fields: [makerId], references: [id])
+  
+  // Maker offers submitted for this order request
+  offers          OrderOffer[]
+  
+  // QC check details
+  weight          Float?       // Final printed weight in grams
+  qcPhoto         String?      // Base64 QC image
+  trackingNumber  String?      // Postal/Delivery tracking number
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  review          Review?
+}
+
+model OrderOffer {
+  id            String   @id @default(uuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  makerId       String
+  maker         User     @relation("MakerOffers", fields: [makerId], references: [id], onDelete: Cascade)
+  
+  price         Float    // Предложенная мастером цена за печать детали (руб.)
+  estimatedDays Int      @default(2) // Срок изготовления в днях
+  comment       String?  // Примечание мастера (например, тип принтера или пластик)
+  status        String   @default("PENDING") // "PENDING" | "ACCEPTED" | "REJECTED"
+  
+  createdAt     DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rating    Int      // 1 to 5
+  comment   String
+  makerId   String
+  maker     User     @relation("MakerReviews", fields: [makerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
