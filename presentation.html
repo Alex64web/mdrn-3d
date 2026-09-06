@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MDRN 3D — Startup Pitch Deck</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #07090e;
+      color: #f8fafc;
+      user-select: none;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .hud-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.25);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.25);
+    }
+    .slide {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      transform: scale(0.98);
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .slide { display: flex !important; opacity: 1 !important; transform: none !important; page-break-after: always; height: 100vh !important; }
+      body { background-color: #07090e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body class="min-h-screen hud-grid flex flex-col justify-between overflow-x-hidden">
+
+  <!-- TOP BAR / HUD TELEMETRY -->
+  <header class="no-print border-b border-white/[0.06] bg-slate-950/80 backdrop-blur-md px-6 py-3 flex items-center justify-between z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
+      <span class="font-mono text-xs font-bold tracking-widest text-emerald-400">MDRN 3D // PITCH DECK</span>
+      <span class="text-xs text-slate-500 hidden sm:inline">• СТАРТАП-КОНКУРС 2026</span>
+    </div>
+    
+    <!-- Controls & Timer -->
+    <div class="flex items-center gap-3">
+      <!-- Pitch Timer -->
+      <div class="flex items-center gap-2 bg-slate-900 border border-white/10 px-3 py-1 rounded-lg font-mono text-xs text-slate-300">
+        <span class="text-slate-500">ТАЙМЕР:</span>
+        <span id="timer" class="text-amber-400 font-bold">00:00</span>
+        <button id="timer-btn" onclick="toggleTimer()" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300 transition">СТАРТ</button>
+      </div>
+
+      <!-- Notes toggle -->
+      <button onclick="toggleNotes()" id="notes-btn" class="text-xs font-mono px-3 py-1 rounded-lg border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+        <span>📝 Шпаргалка</span>
+      </button>
+
+      <!-- Fullscreen -->
+      <button onclick="toggleFullscreen()" class="text-xs font-mono px-3 py-1 rounded-lg border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 transition hidden sm:inline">
+        ⛶ Экран (F11)
+      </button>
+
+      <!-- Print to PDF -->
+      <button onclick="window.print()" class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 transition">
+        Печать / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- SLIDES CONTAINER -->
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-8 max-w-7xl mx-auto w-full">
+
+    <!-- ================= SLIDE 1 ================= -->
+    <section class="slide active flex-col w-full justify-between min-h-[640px]" data-slide="1">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono mb-4">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          PITCH DECK // STARTUP COMPETITION 2026
+        </div>
+        <h1 class="text-5xl sm:text-7xl font-black tracking-tight text-white mb-2">
+          MDRN <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500">3D</span>
+        </h1>
+        <p class="text-xl sm:text-2xl font-semibold text-cyan-400 mb-6">
+          Распределенная фабрика 3D-печати по требованию
+        </p>
+
+        <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 glow-cyan mb-8">
+          <p class="text-base sm:text-lg text-slate-200 italic font-medium leading-relaxed">
+            «Uber для 3D-печати: превращаем тысячи простаивающих 3D-принтеров по всей стране в единую умную фабрику. От загрузки 3D-файла до готового физического изделия у вашей двери за 24 часа без покупки дорогого оборудования».
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-card p-4 rounded-xl border-l-4 border-l-emerald-500">
+            <span class="text-xs font-mono text-emerald-400 font-bold block mb-1">РАБОТАЮЩИЙ ПРОДУКТ</span>
+            <p class="text-xs text-slate-300">Сервис развернут онлайн на mdrn-3d.vercel.app. Браузерный 3D-движок, биржа и Escrow.</p>
+          </div>
+          <div class="glass-card p-4 rounded-xl border-l-4 border-l-cyan-500">
+            <span class="text-xs font-mono text-cyan-400 font-bold block mb-1">ZERO CAPEX МОДЕЛЬ</span>
+            <p class="text-xs text-slate-300">0 собственных станков. Монетизируем свободные мощности мейкеров и студий.</p>
+          </div>
+          <div class="glass-card p-4 rounded-xl border-l-4 border-l-amber-500">
+            <span class="text-xs font-mono text-amber-400 font-bold block mb-1">100% ESCROW-ГАРАНТИЯ</span>
+            <p class="text-xs text-slate-300">Безопасная сделка: холдирование платежа до QC-фотоконтроля и проверки веса.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 2 ================= -->
+    <section class="slide flex-col w-full justify-between min-h-[640px]" data-slide="2">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono mb-3">
+          [ 02 // РЫНОЧНАЯ БОЛЬ ]
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-1">
+          Традиционная 3D-печать сломана для всех участников
+        </h2>
+        <p class="text-sm sm:text-base text-slate-400 mb-6">Клиенты теряют дни на согласование, а парки принтеров простаивают без заказов</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+          <div class="glass-card p-5 rounded-2xl border-t-2 border-t-rose-500">
+            <span class="text-xs font-mono text-rose-400 font-bold tracking-wider block mb-3">ДЛЯ КЛИЕНТОВ И БИЗНЕСА</span>
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
+              <li><strong class="text-white">Порог входа:</strong> Надежный принтер стоит от 60 000 ₽ + десятки часов на калибровку и слайсинг.</li>
+              <li><strong class="text-white">Бюрократия студий:</strong> Обычные 3D-студии рассчитывают КП вручную по 24–48 часов с непрозрачной наценкой.</li>
+              <li><strong class="text-white">Риск брака:</strong> При заказе у частников нет гарантий качества и возврата денег.</li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl border-t-2 border-t-amber-500">
+            <span class="text-xs font-mono text-amber-400 font-bold tracking-wider block mb-3">ДЛЯ ВЛАДЕЛЬЦЕВ ПРИНТЕРОВ</span>
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
+              <li><strong class="text-white">70%+ простоя:</strong> Принтеры куплены, но большую часть недели простаивают без клиентов.</li>
+              <li><strong class="text-white">Сложный маркетинг:</strong> Частному мейкеру тяжело продвигать себя на Авито и конкурировать со студиями.</li>
+              <li><strong class="text-white">Риск неоплаты:</strong> Клиенты отказываются забирать готовые детали или сбивают цену.</li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl border-t-2 border-t-cyan-500">
+            <span class="text-xs font-mono text-cyan-400 font-bold tracking-wider block mb-3">ДЛЯ 3D-ДИЗАЙНЕРОВ</span>
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
+              <li><strong class="text-white">Пиратство моделей:</strong> Выложенные STL-файлы моментально утекают на форумы и торренты.</li>
+              <li><strong class="text-white">Нет роялти:</strong> Автор продает модель один раз за копейки вместо процента с каждого тиража.</li>
+              <li><strong class="text-white">Разрыв цепочки:</strong> Нет прямой связки между цифровым 3D-файлом и производством.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl border border-rose-500/20 bg-rose-950/20 flex items-center justify-between text-xs sm:text-sm text-rose-300 font-mono">
+          <span>⚡ СТАТИСТИКА: 73% частных принтеров простаивают • 48 часов среднее ожидание ответа обычных 3D-студий</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 3 ================= -->
+    <section class="slide flex-col w-full justify-between min-h-[640px]" data-slide="3">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono mb-3">
+          [ 03 // НАШЕ РЕШЕНИЕ ]
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-1">
+          MDRN 3D — Единая технологическая экосистема
+        </h2>
+        <p class="text-sm sm:text-base text-slate-400 mb-6">Бесшовная цифровая цепочка: Загрузка STL → Аукцион мастеров → Escrow-сделка → QC → Доставка</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+          <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+            <div class="text-3xl font-mono font-black text-cyan-400/40 mb-2">01</div>
+            <h3 class="text-base font-bold text-white mb-2">Мгновенный 3D-калькулятор</h3>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✔ Расчет за 2 секунды прямо в браузере</li>
+              <li>✔ WebGL / Three.js интерактивный просмотр</li>
+              <li>✔ Расчет объема, габаритов и расхода филамента</li>
+              <li>✔ Выбор материалов: PLA, PETG, ABS, TPU</li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl relative overflow-hidden border border-emerald-500/30">
+            <div class="text-3xl font-mono font-black text-emerald-400/40 mb-2">02</div>
+            <h3 class="text-base font-bold text-white mb-2">Обратный аукцион мейкеров</h3>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✔ Заявку видят проверенные мейкеры сети</li>
+              <li>✔ Мастера конкурируют по цене и срокам</li>
+              <li>✔ Выбор оборудования (Bambu Lab, Creality и др.)</li>
+              <li>✔ Экономия для клиента до 40% за счет торгов</li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+            <div class="text-3xl font-mono font-black text-amber-400/40 mb-2">03</div>
+            <h3 class="text-base font-bold text-white mb-2">100% Escrow & Фото-QC</h3>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✔ Деньги замораживаются до приемки клиентом</li>
+              <li>✔ Обязательное фото готовой детали перед отправкой</li>
+              <li>✔ Точное контрольное взвешивание на весах</li>
+              <li>✔ Трек-номер посылки в едином терминале</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl border border-cyan-500/20 bg-cyan-950/20">
+          <span class="text-xs font-mono text-cyan-400 font-bold block mb-1">КАТАЛОГ С РОЯЛТИ ДЛЯ ДИЗАЙНЕРОВ:</span>
+          <p class="text-xs sm:text-sm text-slate-300">
+            3D-художники загружают модели и получают авторский процент (роялти) с <strong>каждого</strong> физически напечатанного изделия. Платформа превращает цифровой арт в пассивный доход.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 4 ================= -->
+    <section class="slide flex-col w-full justify-between min-h-[640px]" data-slide="4">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono mb-3">
+          [ 04 // РЫНОК И ВОЗМОЖНОСТИ ]
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-1">
+          Рынок аддитивного производства растет на 22% в год
+        </h2>
+        <p class="text-sm sm:text-base text-slate-400 mb-6">Импортозамещение запчастей и технологический скачок создают идеальное окно для входа</p>
+
+        <!-- TAM SAM SOM -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+          <div class="glass-card p-5 rounded-2xl text-center">
+            <span class="text-xs font-mono text-cyan-400 font-bold block mb-2">TAM • МИРОВОЙ РЫНОК</span>
+            <div class="text-4xl sm:text-5xl font-mono font-black text-white mb-2">$50.8B</div>
+            <p class="text-xs text-slate-400">Объем мирового рынка аддитивного производства к 2030 году (CAGR 22.4%).</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl text-center border border-emerald-500/30">
+            <span class="text-xs font-mono text-emerald-400 font-bold block mb-2">SAM • РЫНОК РФ И СНГ</span>
+            <div class="text-4xl sm:text-5xl font-mono font-black text-emerald-400 mb-2">45 Млрд ₽</div>
+            <p class="text-xs text-slate-400">Прототипирование, запчасти, корпуса, мелкосерийные партии и кастом.</p>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl text-center">
+            <span class="text-xs font-mono text-amber-400 font-bold block mb-2">SOM • ЦЕЛЬ НА 3 ГОДА</span>
+            <div class="text-4xl sm:text-5xl font-mono font-black text-amber-400 mb-2">3.5 Млрд ₽</div>
+            <p class="text-xs text-slate-400">Достижимый сегмент распределенной печати по требованию для малого бизнеса и физлиц.</p>
+          </div>
+        </div>
+
+        <!-- Drivers -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-4 rounded-xl">
+            <span class="text-xs font-mono text-emerald-400 font-bold block mb-1">★ ИМПОРТОЗАМЕЩЕНИЕ</span>
+            <p class="text-xs text-slate-300">Острый дефицит редких запчастей, автокомпонентов и корпусов из-за ухода западных брендов.</p>
+          </div>
+          <div class="glass-card p-4 rounded-xl">
+            <span class="text-xs font-mono text-cyan-400 font-bold block mb-1">★ СКОРОСТНЫЕ СТАНКИ</span>
+            <p class="text-xs text-slate-300">Революция скоростных принтеров (Bambu Lab, Creality K1) сделала печать быстрой и высокоточной.</p>
+          </div>
+          <div class="glass-card p-4 rounded-xl">
+            <span class="text-xs font-mono text-amber-400 font-bold block mb-1">★ ЛОКАЛЬНАЯ ЛОГИСТИКА</span>
+            <p class="text-xs text-slate-300">Печать детали в том же городе за пару часов устраняет огромные склады и межгородскую доставку.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 5 ================= -->
+    <section class="slide flex-col w-full justify-between min-h-[640px]" data-slide="5">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono mb-3">
+          [ 05 // БИЗНЕС-МОДЕЛЬ ]
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-1">
+          Масштабируемый Take Rate без затрат на оборудование
+        </h2>
+        <p class="text-sm sm:text-base text-slate-400 mb-6">Высокая валовая маржинальность платформы благодаря цифровому посредничеству</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Streams -->
+          <div class="glass-card p-5 rounded-2xl">
+            <h3 class="text-sm font-mono font-bold text-amber-400 mb-4 tracking-wider">ИСТОЧНИКИ ВЫРУЧКИ</h3>
+            <div class="space-y-3 text-xs sm:text-sm">
+              <div class="border-b border-white/5 pb-2">
+                <span class="text-white font-bold block">1. Комиссия платформы (Take Rate): 15–20%</span>
+                <span class="text-slate-400">С каждой сделки за матчинг, 3D-калькулятор, Escrow и гарантию качества.</span>
+              </div>
+              <div class="border-b border-white/5 pb-2">
+                <span class="text-white font-bold block">2. Комиссия с авторских роялти: 10%</span>
+                <span class="text-slate-400">С выплат 3D-дизайнерам за продажу их моделей через каталог.</span>
+              </div>
+              <div class="border-b border-white/5 pb-2">
+                <span class="text-white font-bold block">3. SaaS PRO-подписка для ферм: 2 990 ₽/мес</span>
+                <span class="text-slate-400">Приоритет в аукционах, пакетная печать и расширенная телеметрия станков.</span>
+              </div>
+              <div>
+                <span class="text-white font-bold block">4. Корпоративные B2B-контракты</span>
+                <span class="text-slate-400">Аутсорсинг деталей для автосервисов, клиник и инжиниринга с НДС.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unit Economics -->
+          <div class="glass-card p-5 rounded-2xl border border-emerald-500/20 bg-emerald-950/10">
+            <h3 class="text-sm font-mono font-bold text-emerald-400 mb-4 tracking-wider">ЮНИТ-ЭКОНОМИКА ОДНОГО ЗАКАЗА</h3>
+            <div class="space-y-2 font-mono text-xs sm:text-sm">
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-slate-300">Средний чек (AOV):</span>
+                <span class="text-white font-bold">1 800 ₽</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-slate-400">Выплата мейкеру (печать):</span>
+                <span class="text-slate-400">1 350 ₽ (75%)</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-slate-400">Роялти дизайнеру:</span>
+                <span class="text-slate-400">150 ₽ (8%)</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5 bg-emerald-500/10 px-2 rounded">
+                <span class="text-emerald-400 font-bold">Валовая прибыль MDRN 3D:</span>
+                <span class="text-emerald-400 font-bold">300 ₽ (~17%)</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-slate-300">Стоимость привлечения (CAC):</span>
+                <span class="text-slate-300">450 ₽</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span class="text-cyan-400 font-bold">LTV (пожизненная ценность):</span>
+                <span class="text-cyan-400 font-bold">2 100 ₽ (7 заказов)</span>
+              </div>
+              <div class="flex justify-between py-1">
+                <span class="text-amber-400 font-bold">LTV / CAC:</span>
+                <span class="text-amber-400 font-bold">> 4.6x (Отличная сходимость)</span>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 text-xs text-emerald-300 font-mono">
+              ★ При 5 000 заказов/мес чистый доход платформы: 1.5+ млн ₽/мес.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 6 ================= -->
+    <section class="slide flex-col w-full justify-between min-h-[640px]" data-slide="6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono mb-3">
+          [ 06 // ДОСТИЖЕНИЯ И ЗАПРОС ]
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-1">
+          Работающий продукт готов к масштабированию
+        </h2>
+        <p class="text-sm sm:text-base text-slate-400 mb-6">Привлекаем посевной раунд 3.5 млн ₽ для подключения 500+ узлов печати</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+          <div class="glass-card p-5 rounded-2xl">
+            <span class="text-xs font-mono text-emerald-400 font-bold block mb-3">ТЕКУЩИЙ СТАТУС (TRACTION)</span>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✔ <strong>Рабочий Production:</strong> mdrn-3d.vercel.app на Next.js + Neon PostgreSQL</li>
+              <li>✔ <strong>3D-инжиниринг:</strong> Three.js WebGL вьювер с точным расчетом геометрии</li>
+              <li>✔ <strong>Сделка под ключ:</strong> Заявка → Аукцион → Escrow → QC фото → Отзыв</li>
+              <li>✔ <strong>Ролевая модель:</strong> Личные кабинеты Клиента, Мастера и Дизайнера</li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl">
+            <span class="text-xs font-mono text-cyan-400 font-bold block mb-3">ПЛАН РАЗВИТИЯ (12 МЕС.)</span>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>➔ <strong>Q1–Q2:</strong> 500+ проверенных узлов печати в 15 миллионниках РФ</li>
+              <li>➔ <strong>Q3:</strong> B2B-кабинет для автосервисов, клиник и инженеров с ЭДО и НДС</li>
+              <li>➔ <strong>Q4:</strong> Облачный автослайсинг G-code и экспресс-доставка СДЭК / Яндекс</li>
+              <li>➔ <strong>2027:</strong> AI-проверка моделей на ошибки печати</li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-5 rounded-2xl border border-amber-500/30">
+            <span class="text-xs font-mono text-amber-400 font-bold block mb-2">НАШ ЗАПРОС (THE ASK)</span>
+            <div class="text-3xl font-mono font-bold text-amber-400 mb-2">3 500 000 ₽</div>
+            <p class="text-xs text-slate-300 mb-3">Инвестиции / Грант на масштабирование:</p>
+            <ul class="text-[11px] text-slate-400 space-y-1 mb-3">
+              <li>• 50% — Привлечение клиентов и B2B</li>
+              <li>• 30% — Автоматизация API и софта</li>
+              <li>• 20% — Проверка качества и онбординг</li>
+            </ul>
+            <div class="pt-2 border-t border-white/10 text-xs font-mono text-emerald-400">
+              Партнерства: производители пластика, службы доставки.
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl border border-white/10 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+          <div class="flex items-center gap-4">
+            <span class="text-white font-bold">🌐 ДЕМО: <a href="https://mdrn-3d.vercel.app" target="_blank" class="text-cyan-400 underline">mdrn-3d.vercel.app</a></span>
+            <span class="text-slate-400">📦 GitHub: github.com/Alex64web/mdrn-3d</span>
+          </div>
+          <div class="text-emerald-400 font-bold">
+            Спасибо за внимание! Готовы к вашим вопросам.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SPEAKER NOTES POPUP / STRIP -->
+  <aside id="notes-panel" class="no-print bg-slate-900/95 border-t border-white/10 p-4 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex items-start gap-4">
+      <div class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 shrink-0"></div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-mono text-amber-400 font-bold">СЛОВА СПИКЕРА ДЛЯ СЛАЙДА <span id="notes-slide-num">1</span>:</span>
+          <span class="text-[11px] text-slate-500 font-mono">Шпаргалка (клавиша N)</span>
+        </div>
+        <p id="notes-text" class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
+          Загрузка заметок...
+        </p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- FOOTER CONTROLS -->
+  <footer class="no-print border-t border-white/[0.06] bg-slate-950/80 px-6 py-3 flex items-center justify-between text-xs font-mono text-slate-400">
+    <div class="flex items-center gap-2">
+      <span>Навигация:</span>
+      <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-white/10 text-white">←</kbd>
+      <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-white/10 text-white">→</kbd>
+      <span class="hidden sm:inline">или Пробел</span>
+    </div>
+
+    <!-- Dots -->
+    <div class="flex items-center gap-1.5" id="dots-container">
+      <!-- Generated via JS -->
+    </div>
+
+    <!-- Prev / Next Buttons -->
+    <div class="flex items-center gap-2">
+      <button onclick="prevSlide()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition">Назад</button>
+      <span id="slide-counter" class="text-white font-bold px-2">1 / 6</span>
+      <button onclick="nextSlide()" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition">Далее →</button>
+    </div>
+  </footer>
+
+  <script>
+    const speakerNotes = {
+      1: "«Добрый день, уважаемые эксперты и жюри! Меня зовут [Ваше Имя], и сегодня я представляю проект MDRN 3D. Мы создаем распределенную фабрику аддитивного производства — по сути, Uber для 3D-печати. Сегодня сотни тысяч 3D-принтеров стоят без дела в квартирах и мастерских, в то время как бизнесу и людям нужны запчасти, прототипы и корпуса быстро и без бюрократии. MDRN 3D объединяет клиентов, мейкеров и дизайнеров на единой платформе с мгновенным 3D-расчетом и 100% Escrow-гарантией. Наш рабочий MVP уже в продакшене онлайн!»",
+      2: "«Почему рынок 3D-печати до сих пор не стал массовым? Он сломан для всех трех сторон. Обычные клиенты: купить принтер — дорого и сложно, а студии считают КП 2 дня с дикой наценкой. Владельцы принтеров: более 70% времени станки просто пылятся без заказов и нет защиты от неплатежей. Дизайнеры: модели пиратят на торрентах, автор не получает ни копейки с физических копий. Мы устраняем этот хаос цифровой платформой.»",
+      3: "«Как работает сервис: 1. Клиент за 2 секунды получает 3D-рендеринг и точный расчет веса прямо в браузере. 2. Заявка уходит на биржу, где мейкеры соревнуются в открытом аукционе, снижая цену клиенту до 40%. 3. Деньги замораживаются в Escrow, мастер обязан прикрепить фотоотчет и вес детали на весах перед отправкой. А 3D-дизайнеры получают честные роялти за каждую напечатанную копию!»",
+      4: "«Рынок аддитивного производства растет более чем на 22% в год и к 2030 году превысит 50 миллиардов долларов. В РФ объем рынка запчастей и прототипов — 45 млрд рублей. Из-за санкций возник острый дефицит деталей. Появились быстрые принтеры нового поколения Bambu Lab. Наш ответ — локальная печать детали за 24 часа без гигантских заводов.»",
+      5: "«Бизнес-модель масштабируема: мы не покупаем станки. Зарабатываем 15–20% Take Rate с каждого заказа, плюс 10% с роялти и B2B PRO-подписки. Средний чек — 1 800 ₽, доход платформы — 300 ₽. CAC — 450 ₽, а LTV — 2 100 ₽. Соотношение LTV к CAC превышает 4.6x — отличная юнит-экономика уже на старте!»",
+      6: "«Мы пришли не с презентацией идеи, а с готовым работающим продуктом: сервис развернут на Vercel с базой данных Neon PostgreSQL и 3D-движком. За 12 месяцев мы подключим 500 узлов печати в 15 городах и запустим B2B-кабинет. Привлекаем 3.5 миллиона рублей инвестиций или гранта на масштабирование. Демо доступно прямо сейчас на mdrn-3d.vercel.app. Спасибо за внимание, готов к вопросам!»"
+    };
+
+    let currentSlide = 1;
+    const totalSlides = 6;
+    let timerInterval = null;
+    let seconds = 0;
+    let timerRunning = false;
+
+    function updateSlide() {
+      document.querySelectorAll('.slide').forEach(s => {
+        s.classList.remove('active');
+        if (parseInt(s.dataset.slide) === currentSlide) {
+          s.classList.add('active');
+        }
+      });
+      document.getElementById('slide-counter').textContent = `${currentSlide} / ${totalSlides}`;
+      document.getElementById('notes-slide-num').textContent = currentSlide;
+      document.getElementById('notes-text').textContent = speakerNotes[currentSlide] || "";
+      
+      // Update dots
+      document.querySelectorAll('.slide-dot').forEach((dot, idx) => {
+        if (idx + 1 === currentSlide) {
+          dot.className = 'slide-dot w-6 h-1.5 rounded-full bg-emerald-400 transition-all';
+        } else {
+          dot.className = 'slide-dot w-2 h-1.5 rounded-full bg-slate-700 hover:bg-slate-500 transition-all cursor-pointer';
+        }
+      });
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(n) {
+      currentSlide = n;
+      updateSlide();
+    }
+
+    function toggleNotes() {
+      const panel = document.getElementById('notes-panel');
+      panel.classList.toggle('hidden');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('timer-btn');
+      if (!timerRunning) {
+        timerRunning = true;
+        btn.textContent = 'СТОП';
+        btn.classList.replace('bg-slate-800', 'bg-rose-900');
+        timerInterval = setInterval(() => {
+          seconds++;
+          const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+          const secs = String(seconds % 60).padStart(2, '0');
+          document.getElementById('timer').textContent = `${mins}:${secs}`;
+        }, 1000);
+      } else {
+        timerRunning = false;
+        btn.textContent = 'СТАРТ';
+        btn.classList.replace('bg-rose-900', 'bg-slate-800');
+        clearInterval(timerInterval);
+      }
+    }
+
+    // Init Dots
+    const dotsContainer = document.getElementById('dots-container');
+    for (let i = 1; i <= totalSlides; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'slide-dot';
+      dot.onclick = () => goToSlide(i);
+      dotsContainer.appendChild(dot);
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'n' || e.key === 'N' || e.key === 'т' || e.key === 'Т') {
+        toggleNotes();
+      } else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
+        toggleFullscreen();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>
